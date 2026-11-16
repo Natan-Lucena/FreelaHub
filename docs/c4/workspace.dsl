@@ -7,8 +7,8 @@ workspace "FreelaHub: Marketplace de Freelancers" "Modelo C4 do trabalho final d
         freelancer = person "Freelancer" "Profissional que busca projetos e envia propostas."
         admin = person "Administrador" "Modera usuários, projetos e disputas."
 
-        gatewayPagamento = softwareSystem "Gateway de Pagamento" "Processa pagamentos (ex.: Mercado Pago / Stripe em modo sandbox)." "Externo"
-        servicoEmail = softwareSystem "Serviço de E-mail" "Envia notificações por e-mail (ex.: SendGrid / SMTP)." "Externo"
+        gatewayPagamento = softwareSystem "Gateway de Pagamento" "Processa pagamentos (ex.: Mercado Pago ou Stripe em modo sandbox)." "Externo"
+        servicoEmail = softwareSystem "Serviço de E-mail" "Envia notificações por e-mail (ex.: SendGrid)." "Externo"
 
         freelahub = softwareSystem "FreelaHub" "Plataforma que conecta clientes a freelancers, gerenciando projetos, propostas, contratos e pagamentos." {
             webapp = container "Aplicação Web" "Interface para clientes, freelancers e administradores." "React + TypeScript" "Browser"
@@ -23,6 +23,8 @@ workspace "FreelaHub: Marketplace de Freelancers" "Modelo C4 do trabalho final d
         freelahub -> gatewayPagamento "Solicita cobranças e repasses" "HTTPS/REST"
         freelahub -> servicoEmail "Envia notificações" "HTTPS/REST"
         gatewayPagamento -> freelahub "Confirma status de pagamento" "Webhook HTTPS"
+        servicoEmail -> cliente "Entrega notificações por e-mail" "SMTP"
+        servicoEmail -> freelancer "Entrega notificações por e-mail" "SMTP"
 
         # Relações no nível de container
         cliente -> freelahub.webapp "Usa" "HTTPS"
@@ -44,6 +46,8 @@ workspace "FreelaHub: Marketplace de Freelancers" "Modelo C4 do trabalho final d
 
         container freelahub "Containers" {
             include *
+            exclude "servicoEmail -> cliente"
+            exclude "servicoEmail -> freelancer"
             autolayout lr
             description "Diagrama de Containers (C4 nível 2) do FreelaHub."
         }

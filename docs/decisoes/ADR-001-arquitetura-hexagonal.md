@@ -2,6 +2,7 @@
 
 **Status:** Aceita
 **Data:** 16/11/2026
+**Responsável:** Equipe
 
 ## Contexto
 O FreelaHub é um marketplace que conecta clientes e freelancers. O núcleo do sistema tem regras de negócio próprias (ciclo de vida de projetos, propostas, contratos e pagamentos) e depende de vários elementos externos: banco de dados, gateway de pagamento, serviço de e-mail e a interface web.
@@ -13,11 +14,11 @@ Adotar majoritariamente a **Arquitetura Hexagonal (Ports and Adapters)** no back
 
 - **Domínio:** entidades e regras de negócio, sem dependência de frameworks.
 - **Aplicação:** casos de uso que orquestram o domínio e declaram as **portas**:
-  - Portas de entrada: casos de uso como `PublicarProjeto`, `EnviarProposta`, `AceitarProposta`, `LiberarPagamento`.
-  - Portas de saída: `ProjetoRepository`, `PropostaRepository`, `ContratoRepository`, `PaymentGateway`, `NotificationService`.
+  - Portas de entrada: casos de uso como `Autenticar`, `PublicarProjeto`, `EnviarProposta`, `AceitarProposta`, `RealizarPagamento` e `LiberarPagamento`.
+  - Portas de saída: `UsuarioRepository`, `ProjetoRepository`, `PropostaRepository`, `ContratoRepository`, `PagamentoRepository`, `TokenService`, `PaymentGateway` e `NotificationService`.
 - **Adaptadores:**
   - Entrada: controllers HTTP (Express).
-  - Saída: repositórios PostgreSQL, `FakePaymentAdapter` e `ConsoleNotificationAdapter`.
+  - Saída: repositórios PostgreSQL, adaptador JWT, `FakePaymentAdapter` e `ConsoleNotificationAdapter`.
 
 ## Alternativas consideradas
 - **Microkernel:** faria sentido se o foco fosse extensibilidade por plugins (por exemplo, métodos de pagamento plugáveis). Foi descartado porque o principal desafio do sistema é isolar o domínio das integrações, e não carregar plugins em tempo de execução.
