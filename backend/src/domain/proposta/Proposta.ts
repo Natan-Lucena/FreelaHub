@@ -1,4 +1,4 @@
-import { DadosInvalidosError, RegraDeNegocioError } from '../erros';
+import { ErroValidacao, ErroConflito } from '../erros';
 
 export type StatusProposta = 'PENDENTE' | 'ACEITA' | 'RECUSADA';
 
@@ -36,16 +36,16 @@ export class Proposta {
     const { valor, prazoDias, mensagem } = nova;
 
     if (typeof valor !== 'number' || !Number.isFinite(valor) || valor <= 0) {
-      throw new DadosInvalidosError('O valor da proposta deve ser um número maior que zero.');
+      throw new ErroValidacao('O valor da proposta deve ser um número maior que zero.');
     }
     if (typeof prazoDias !== 'number' || !Number.isInteger(prazoDias) || prazoDias <= 0) {
-      throw new DadosInvalidosError('O prazo de entrega deve ser um número inteiro de dias maior que zero.');
+      throw new ErroValidacao('O prazo de entrega deve ser um número inteiro de dias maior que zero.');
     }
     if (typeof mensagem !== 'string' || mensagem.trim() === '') {
-      throw new DadosInvalidosError('A mensagem de apresentação é obrigatória.');
+      throw new ErroValidacao('A mensagem de apresentação é obrigatória.');
     }
     if (mensagem.length > TAMANHO_MAXIMO_MENSAGEM) {
-      throw new DadosInvalidosError(
+      throw new ErroValidacao(
         `A mensagem de apresentação deve ter no máximo ${TAMANHO_MAXIMO_MENSAGEM} caracteres.`,
       );
     }
@@ -109,7 +109,7 @@ export class Proposta {
 
   private garantirPendente(): void {
     if (this.dados.status !== 'PENDENTE') {
-      throw new RegraDeNegocioError(
+      throw new ErroConflito(
         `A proposta já está com status ${this.dados.status} e não pode mudar de status.`,
       );
     }

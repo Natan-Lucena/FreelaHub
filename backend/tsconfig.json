@@ -1,16 +1,17 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "lib": ["ES2022"],
     "types": ["node"],
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "outDir": "dist",
-    "rootDir": "."
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noEmit": true
   },
-  "include": ["src", "tests", "vitest.config.mts"]
+  "include": ["src", "tests"]
 }

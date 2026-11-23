@@ -1,4 +1,4 @@
-import { AcessoNegadoError, RecursoNaoEncontradoError } from '../../domain/erros';
+import { ErroSemPermissao, ErroNaoEncontrado } from '../../domain/erros';
 import { DadosProposta } from '../../domain/proposta/Proposta';
 import { ProjetoConsulta } from '../ports/ProjetoConsulta';
 import { PropostaRepository } from '../ports/PropostaRepository';
@@ -19,10 +19,10 @@ export class ListarPropostasDoProjeto {
   async executar(entrada: ListarPropostasDoProjetoEntrada): Promise<DadosProposta[]> {
     const projeto = await this.projetos.buscarResumo(entrada.projetoId);
     if (!projeto) {
-      throw new RecursoNaoEncontradoError('Projeto não encontrado.');
+      throw new ErroNaoEncontrado('Projeto não encontrado.');
     }
     if (projeto.clienteId !== entrada.solicitante.id) {
-      throw new AcessoNegadoError('Somente o cliente dono do projeto pode ver as propostas recebidas.');
+      throw new ErroSemPermissao('Somente o cliente dono do projeto pode ver as propostas recebidas.');
     }
 
     const propostas = await this.propostas.listarPorProjeto(projeto.id);

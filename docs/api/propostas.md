@@ -5,7 +5,7 @@ Rotas da fatia de propostas. Todas exigem o cabeçalho `Authorization: Bearer <t
 Erros seguem o formato padrão da API:
 
 ```json
-{ "erro": "Mensagem legível para o usuário." }
+{ "erro": { "codigo": "CONFLITO", "mensagem": "Mensagem legível para o usuário." } }
 ```
 
 ## Enviar proposta

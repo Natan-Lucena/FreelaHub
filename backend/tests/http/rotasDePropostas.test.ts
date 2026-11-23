@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { RequestHandler } from 'express';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
@@ -8,12 +9,14 @@ import { InMemoryPropostaRepository } from '../../src/adapters/out/memoria/InMem
 import { EnviarProposta } from '../../src/application/casos-de-uso/EnviarProposta';
 import { ListarPropostasDoProjeto } from '../../src/application/casos-de-uso/ListarPropostasDoProjeto';
 import { PerfilUsuario } from '../../src/application/Solicitante';
+import { Autenticar } from '../../src/application/usecases/Autenticar';
+import { Cadastrar } from '../../src/application/usecases/Cadastrar';
 import { InMemoryProjetoConsulta } from '../fakes/InMemoryProjetoConsulta';
 
 /** Substitui o middleware JWT: identifica o usuário pelos cabeçalhos de teste. */
-const autenticacaoDeTeste: RequestHandler = (req, res, next) => {
-  res.locals.usuario = {
-    id: req.header('x-usuario-id'),
+const autenticacaoDeTeste: RequestHandler = (req, _res, next) => {
+  req.usuario = {
+    id: String(req.header('x-usuario-id')),
     perfil: req.header('x-usuario-perfil') as PerfilUsuario,
   };
   next();
@@ -25,13 +28,17 @@ function montarApp() {
   const propostas = new InMemoryPropostaRepository();
   const notificacoes = new InMemoryNotificationService();
 
-  return criarApp([
-    criarRotasDePropostas({
-      enviarProposta: new EnviarProposta(projetos, propostas, notificacoes),
-      listarPropostasDoProjeto: new ListarPropostasDoProjeto(projetos, propostas),
-      autenticar: autenticacaoDeTeste,
-    }),
-  ]);
+  return criarApp({
+    cadastrar: {} as Cadastrar,
+    autenticar: {} as Autenticar,
+    rotasAdicionais: [
+      criarRotasDePropostas({
+        enviarProposta: new EnviarProposta(projetos, propostas, notificacoes, randomUUID),
+        listarPropostasDoProjeto: new ListarPropostasDoProjeto(projetos, propostas),
+        autenticar: autenticacaoDeTeste,
+      }),
+    ],
+  });
 }
 
 describe('Rotas de propostas', () => {

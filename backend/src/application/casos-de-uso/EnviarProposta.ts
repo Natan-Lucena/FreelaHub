@@ -1,8 +1,7 @@
-import { randomUUID } from 'node:crypto';
 import {
-  AcessoNegadoError,
-  RecursoNaoEncontradoError,
-  RegraDeNegocioError,
+  ErroSemPermissao,
+  ErroNaoEncontrado,
+  ErroConflito,
 } from '../../domain/erros';
 import { DadosProposta, Proposta } from '../../domain/proposta/Proposta';
 import { NotificationService } from '../ports/NotificationService';
@@ -27,29 +26,29 @@ export class EnviarProposta {
     private readonly projetos: ProjetoConsulta,
     private readonly propostas: PropostaRepository,
     private readonly notificacoes: NotificationService,
-    private readonly gerarId: () => string = randomUUID,
+    private readonly gerarId: () => string,
   ) {}
 
   async executar(entrada: EnviarPropostaEntrada): Promise<DadosProposta> {
     const { solicitante } = entrada;
 
     if (solicitante.perfil !== 'FREELANCER') {
-      throw new AcessoNegadoError('Somente freelancers podem enviar propostas.');
+      throw new ErroSemPermissao('Somente freelancers podem enviar propostas.');
     }
 
     const projeto = await this.projetos.buscarResumo(entrada.projetoId);
     if (!projeto) {
-      throw new RecursoNaoEncontradoError('Projeto não encontrado.');
+      throw new ErroNaoEncontrado('Projeto não encontrado.');
     }
 
     // RN02
     if (projeto.status !== 'ABERTO') {
-      throw new RegraDeNegocioError('Só é possível enviar proposta para projetos com status ABERTO.');
+      throw new ErroConflito('Só é possível enviar proposta para projetos com status ABERTO.');
     }
 
     // RN03 (também garantida no banco por UNIQUE (projeto_id, freelancer_id))
     if (await this.propostas.existeDoFreelancerNoProjeto(projeto.id, solicitante.id)) {
-      throw new RegraDeNegocioError('Você já enviou uma proposta para este projeto.');
+      throw new ErroConflito('Você já enviou uma proposta para este projeto.');
     }
 
     const proposta = Proposta.criar({

@@ -15,7 +15,7 @@ src/
     out/persistence/      repositórios PostgreSQL
     out/notification/     ConsoleNotificationAdapter (e-mail simulado)
     out/memoria/          adaptadores em memória usados nos testes
-  server.ts               raiz de composição: conecta adaptadores às portas
+  main.ts                 raiz de composição: conecta adaptadores às portas
 tests/                    testes com Vitest e Supertest
 ```
 
@@ -45,11 +45,11 @@ O CI (`.github/workflows/backend.yml`) roda tipos, testes e build em todo pull r
 1. Entidades e regras em `src/domain/<entidade>/`.
 2. Casos de uso em `src/application/casos-de-uso/` e portas de saída em `src/application/ports/`.
 3. Rotas em `src/adapters/in/http/rotas/<recurso>.ts`, exportando uma função `criarRotasDe...` que devolve um `Router`.
-4. Registro das rotas e dos adaptadores concretos em `src/server.ts`.
+4. Registro das rotas e dos adaptadores concretos em `src/main.ts`.
 
 Erros de domínio (`src/domain/erros.ts`) são convertidos em status HTTP por `tratarErros` (400, 401, 403, 404 e 409, ADR-003).
 
-O middleware JWT (RF01) deve gravar o usuário autenticado em `res.locals.usuario` no formato `{ id, perfil }`. Até ele ser integrado, `server.ts` usa `autenticacaoNaoConfigurada`, que responde 401 em todas as rotas protegidas.
+O middleware `autenticar` (RF01) valida o token e grava o usuário em `req.usuario`. As rotas leem esse valor com `obterSolicitante(req)`.
 
 ## Documentação das rotas
 

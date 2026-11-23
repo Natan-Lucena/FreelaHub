@@ -7,7 +7,7 @@ import { obterSolicitante } from '../autenticacao';
 export interface DependenciasRotasDePropostas {
   enviarProposta: EnviarProposta;
   listarPropostasDoProjeto: ListarPropostasDoProjeto;
-  /** Middleware JWT da fatia RF01: grava o usuário em `res.locals.usuario`. */
+  /** Middleware JWT da fatia RF01: grava o usuário em `req.usuario`. */
   autenticar: RequestHandler;
 }
 
@@ -36,7 +36,7 @@ export function criarRotasDePropostas(deps: DependenciasRotasDePropostas): Route
     const corpo = (req.body ?? {}) as Record<string, unknown>;
     const proposta = await deps.enviarProposta.executar({
       projetoId: String(req.params.projetoId),
-      solicitante: obterSolicitante(res),
+      solicitante: obterSolicitante(req),
       valor: corpo.valor,
       prazoDias: corpo.prazoDias,
       mensagem: corpo.mensagem,
@@ -51,7 +51,7 @@ export function criarRotasDePropostas(deps: DependenciasRotasDePropostas): Route
   rotas.get('/projetos/:projetoId/propostas', deps.autenticar, async (req, res) => {
     const propostas = await deps.listarPropostasDoProjeto.executar({
       projetoId: String(req.params.projetoId),
-      solicitante: obterSolicitante(res),
+      solicitante: obterSolicitante(req),
     });
 
     res.status(200).json(propostas.map(propostaParaJson));

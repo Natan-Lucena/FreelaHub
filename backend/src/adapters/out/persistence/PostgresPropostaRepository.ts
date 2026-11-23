@@ -1,5 +1,5 @@
 import { PropostaRepository } from '../../../application/ports/PropostaRepository';
-import { RegraDeNegocioError } from '../../../domain/erros';
+import { ErroConflito } from '../../../domain/erros';
 import { Proposta, StatusProposta } from '../../../domain/proposta/Proposta';
 import { Consultavel } from './Consultavel';
 
@@ -42,7 +42,7 @@ export class PostgresPropostaRepository implements PropostaRepository {
     } catch (erro) {
       // UNIQUE (projeto_id, freelancer_id): duas requisições simultâneas do mesmo freelancer (RN03)
       if ((erro as { code?: string }).code === VIOLACAO_DE_UNICIDADE) {
-        throw new RegraDeNegocioError('Você já enviou uma proposta para este projeto.');
+        throw new ErroConflito('Você já enviou uma proposta para este projeto.');
       }
       throw erro;
     }
